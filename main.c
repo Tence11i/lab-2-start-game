@@ -2,9 +2,14 @@
 #include <windows.h>
 
 #define INV_SLOTS 10
+#define MAX_ITEMS 10
+const char* item_names[MAX_ITEMS] = {"Пусто", "Дерево", "Камень", "Семена", "Железо",
+							  "Золото", "Алмаз", "Аура", "Молот", "Инструкция по бонсмешу"};
 
-const char* item_names[10] = {"Пусто", "Дерево", "Камень", "Семена", "Железо",
-							  "Золото", "Алмаз", "Аура", "Молот", "Инструкция для бонсмеша"};
+void items_id()
+{
+	printf("0 - Ничего \n1 - Дерево \n2 - Камень \n3 - Семена \n4 - Железо \n5 - Золото \n6 - Алмаз \n7 - Аура \n8 - Молот \n9 - Инструкция по бонсмешу \n\n");
+}
 
 int safeInt() //Защита от дурака для ввода чисел
 {
@@ -22,7 +27,7 @@ int main()
 
 	int current_day = 1;
 	int current_hour = 8;
-	int inventory[INV_SLOTS] = { 0 };		// Инициализация основных переменных
+	int inventory[INV_SLOTS] = {9,8,7,7,7,7,7,7,7,7};		// Инициализация основных переменных
 
 	int choice;
 	int hours;
@@ -36,7 +41,8 @@ int main()
 		printf("3. Посмотреть инвентарь.\n");
 		printf("4. Положить предмет в слот.\n");
 		printf("5. Выбросить предмет.\n");
-		printf("6. Любимый ресурс.\n\n");
+		printf("6. Любимый ресурс.\n");
+		printf("0. Выход\n\n");
 
 		choice = safeInt();
 
@@ -66,16 +72,69 @@ int main()
 			break;
 
 		case 4:		//Положить предмет в слот
-			printf("Данная функция ещё не реализована...\n");
+			printf("\nВыберите индекс слота 0-%d\n\n", INV_SLOTS-1);
+			
+			int index = safeInt();
+			
+			if (index < 0 || index >= INV_SLOTS) 
+			{
+				printf("\nОшибка! Такого слота не существует\n");
+				break; 
+			}
+			
+			printf("\nВыберите предмет\n\n");
+			items_id();
+			int id = safeInt();
+
+			if (id == 0) 
+			{ 
+				printf("\nЗачем ложить в слот \"Ничего\", если можно выкинуть предмет, ты дурак?\n");
+				break;
+			}
+			if (id < 0 || id >= MAX_ITEMS) 
+			{
+				printf("\nНеверный ID предмета\n");
+				break;
+			}
+
+			inventory[index] = id;
+			printf("\nПредмет \"%s\" положен в слот [%d]\n", item_names[id], index);
 			break;
 
 		case 5:		//Выбросить предмет
-			printf("Данная функция ещё не реализована...\n");
+			printf("\nВыберите индекс слота 0-%d\n\n", INV_SLOTS - 1);
+
+			int indexdel = safeInt();
+
+			if (indexdel < 0 || indexdel >= INV_SLOTS)
+			{
+				printf("\nОшибка! Такого слота не существует\n");
+				break;
+			}
+
+			inventory[indexdel] = 0;
+			printf("\nСлот %d очищен!\n", indexdel);
 			break;
 
-		case 6:		//Любимый ресурс
-			printf("Данная функция ещё не реализована...\n");
+		case 6: {		//Любимый ресурс Вариант 7
+			int counts[MAX_ITEMS] = { 0 };
+			int bestId = 0;
+
+			for (int i = 0; i < INV_SLOTS; i++) {
+				int id = inventory[i];
+				if (id == 0) continue;               // пустые слоты не считаем
+				counts[id]++;
+				if (counts[id] > counts[bestId]) bestId = id;
+			}
+
+			if (bestId == 0) {
+				printf("\nИнвентарь пуст.\n");
+			}
+			else {
+				printf("\nСамый частый предмет: [%d] - %s, занимает слотов: %d\n", bestId, item_names[bestId], counts[bestId]);
+			}
 			break;
+		}
 
 		default: 
 			printf("Нет такого пункта меню.\n"); //На случай введения цифры не соответствующей какому-либо пункту меню
