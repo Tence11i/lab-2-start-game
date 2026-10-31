@@ -3,13 +3,19 @@
 
 #define INV_SLOTS 10
 #define MAX_ITEMS 10
-const char* item_names[MAX_ITEMS] = {"Пусто", "Дерево", "Камень", "Семена", "Железо",
-							  "Золото", "Алмаз", "Аура", "Молот", "Инструкция по бонсмешу"};
+const char* item_names[MAX_ITEMS] = { "Пусто", "Дерево", "Камень", "Семена", "Железо",
+							  "Золото", "Алмаз", "Монета", "Факел", "Коса"};
+
+int current_day = 1;
+int current_hour = 8;
+int inventory[INV_SLOTS] = { 0 };		// Инициализация основных переменных
+
 
 void items_id()
 {
-	printf("0 - Ничего \n1 - Дерево \n2 - Камень \n3 - Семена \n4 - Железо \n5 - Золото \n6 - Алмаз \n7 - Аура \n8 - Молот \n9 - Инструкция по бонсмешу \n\n");
+	printf("0 - Ничего \n1 - Дерево \n2 - Камень \n3 - Семена \n4 - Железо \n5 - Золото \n6 - Алмаз \n7 - Монета \n8 - Факел \n9 - Коса \n\n");
 }
+
 
 int safeInt() //Защита от дурака для ввода чисел
 {
@@ -21,33 +27,36 @@ int safeInt() //Защита от дурака для ввода чисел
 	return x;
 }
 
+void print_menu()
+{
+	printf("\n====Меню====\n");
+	printf("Введите номер действия:\n");
+	printf("1. Посмотреть на часы.\n");
+	printf("2. Поработать.\n");
+	printf("3. Посмотреть инвентарь.\n");
+	printf("4. Положить предмет в слот.\n");
+	printf("5. Выбросить предмет.\n");
+	printf("6. Любимый ресурс.\n");
+	printf("0. Выход\n\n");
+}
+
 int main()
 {
 	SetConsoleOutputCP(65001); //Без этого вместо русских букв консоль пугает страшными символами
+	SetConsoleCP(65001);
 
-	int current_day = 1;
-	int current_hour = 8;
-	int inventory[INV_SLOTS] = {9,8,7,7,7,7,7,7,7,7};		// Инициализация основных переменных
 
 	int choice;
 	int hours;
 
 
 	do {
-		printf("\n====Меню====\n");
-		printf("Введите номер действия:\n");
-		printf("1. Посмотреть на часы.\n");
-		printf("2. Поработать.\n");
-		printf("3. Посмотреть инвентарь.\n");
-		printf("4. Положить предмет в слот.\n");
-		printf("5. Выбросить предмет.\n");
-		printf("6. Любимый ресурс.\n");
-		printf("0. Выход\n\n");
+		print_menu();
 
 		choice = safeInt();
 
 		switch (choice) {
-		
+
 		case 0:
 			printf("\nВыход...");
 			break;
@@ -72,26 +81,26 @@ int main()
 			break;
 
 		case 4:		//Положить предмет в слот
-			printf("\nВыберите индекс слота 0-%d\n\n", INV_SLOTS-1);
-			
+			printf("\nВыберите индекс слота 0-%d\n\n", INV_SLOTS - 1);
+
 			int index = safeInt();
-			
-			if (index < 0 || index >= INV_SLOTS) 
+
+			if (index < 0 || index >= INV_SLOTS)
 			{
 				printf("\nОшибка! Такого слота не существует\n");
-				break; 
+				break;
 			}
-			
+
 			printf("\nВыберите предмет\n\n");
 			items_id();
 			int id = safeInt();
 
-			if (id == 0) 
-			{ 
+			if (id == 0)
+			{
 				printf("\nЗачем ложить в слот \"Ничего\", если можно выкинуть предмет, ты дурак?\n");
 				break;
 			}
-			if (id < 0 || id >= MAX_ITEMS) 
+			if (id < 0 || id >= MAX_ITEMS)
 			{
 				printf("\nНеверный ID предмета\n");
 				break;
@@ -136,7 +145,7 @@ int main()
 			break;
 		}
 
-		default: 
+		default:
 			printf("Нет такого пункта меню.\n"); //На случай введения цифры не соответствующей какому-либо пункту меню
 			break;
 
