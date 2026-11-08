@@ -40,6 +40,97 @@ void print_menu()
 	printf("0. Выход\n\n");
 }
 
+void show_time()
+{
+	printf("\nТекущее время: День %d, %d : 00 \n", current_day, current_hour);
+}
+
+void work()
+{
+	int hours;
+	printf("\nСколько часов работать?\n");
+	hours = safeInt();
+	current_day = current_day + (current_hour + hours) / 24;
+	current_hour = (current_hour + hours) % 24;
+	printf("\nТекущее время: День %d, %d : 00 \n", current_day, current_hour);
+}
+
+void show_inventory()
+{
+	printf("\n====Инвентарь====\n");
+	for (int i = 0; i < INV_SLOTS; i++) {
+		printf("Слот %d: [%d] - %s\n", i, inventory[i], item_names[inventory[i]]);
+	}
+}
+
+void put_item()
+{
+	printf("\nВыберите индекс слота 0-%d\n\n", INV_SLOTS - 1);
+
+	int index = safeInt();
+
+	if (index < 0 || index >= INV_SLOTS)
+	{
+		printf("\nОшибка! Такого слота не существует\n");
+		return;
+	}
+
+	printf("\nВыберите предмет\n\n");
+	items_id();
+	int id = safeInt();
+
+	if (id == 0)
+	{
+		printf("\nЗачем ложить в слот \"Ничего\", если можно выкинуть предмет, ты дурак?\n");
+		return;
+	}
+	if (id < 0 || id >= MAX_ITEMS)
+	{
+		printf("\nНеверный ID предмета\n");
+		return;
+	}
+
+	inventory[index] = id;
+	printf("\nПредмет \"%s\" положен в слот [%d]\n", item_names[id], index);
+	return;
+}
+
+void throw_item()
+{
+	printf("\nВыберите индекс слота 0-%d\n\n", INV_SLOTS - 1);
+
+	int indexdel = safeInt();
+
+	if (indexdel < 0 || indexdel >= INV_SLOTS)
+	{
+		printf("\nОшибка! Такого слота не существует\n");
+		return;
+	}
+
+	inventory[indexdel] = 0;
+	printf("\nСлот %d очищен!\n", indexdel);
+}
+
+void fav_item() 
+{
+	int counts[MAX_ITEMS] = { 0 };
+	int bestId = 0;
+
+	for (int i = 0; i < INV_SLOTS; i++) {
+		int id = inventory[i];
+		if (id == 0) continue;               // пустые слоты не считаем
+		counts[id]++;
+		if (counts[id] > counts[bestId]) bestId = id;
+	}
+
+	if (bestId == 0) {
+		printf("\nИнвентарь пуст.\n");
+	}
+	else {
+		printf("\nСамый частый предмет: [%d] - %s, занимает слотов: %d\n", bestId, item_names[bestId], counts[bestId]);
+	}
+}
+
 int main()
 {
 	SetConsoleOutputCP(65001); //Без этого вместо русских букв консоль пугает страшными символами
@@ -47,7 +138,6 @@ int main()
 
 
 	int choice;
-	int hours;
 
 
 	do {
@@ -62,89 +152,29 @@ int main()
 			break;
 
 		case 1:		//Посмотреть на часы
-			printf("\nТекущее время: День %d, %d : 00 \n", current_day, current_hour);
+			show_time();
 			break;
 
 		case 2:		//Поработать
-			printf("\nСколько часов работать?\n");
-			hours = safeInt();
-			current_day = current_day + (current_hour + hours) / 24;
-			current_hour = (current_hour + hours) % 24;
-			printf("\nТекущее время: День %d, %d : 00 \n", current_day, current_hour);
+			work();
 			break;
 
 		case 3:		//Посмотреть инвентарь
-			printf("\n====Инвентарь====\n");
-			for (int i = 0; i < INV_SLOTS; i++) {
-				printf("Слот %d: [%d] - %s\n", i, inventory[i], item_names[inventory[i]]);
-			}
+			show_inventory();
 			break;
 
 		case 4:		//Положить предмет в слот
-			printf("\nВыберите индекс слота 0-%d\n\n", INV_SLOTS - 1);
-
-			int index = safeInt();
-
-			if (index < 0 || index >= INV_SLOTS)
-			{
-				printf("\nОшибка! Такого слота не существует\n");
-				break;
-			}
-
-			printf("\nВыберите предмет\n\n");
-			items_id();
-			int id = safeInt();
-
-			if (id == 0)
-			{
-				printf("\nЗачем ложить в слот \"Ничего\", если можно выкинуть предмет, ты дурак?\n");
-				break;
-			}
-			if (id < 0 || id >= MAX_ITEMS)
-			{
-				printf("\nНеверный ID предмета\n");
-				break;
-			}
-
-			inventory[index] = id;
-			printf("\nПредмет \"%s\" положен в слот [%d]\n", item_names[id], index);
+			put_item();
 			break;
 
 		case 5:		//Выбросить предмет
-			printf("\nВыберите индекс слота 0-%d\n\n", INV_SLOTS - 1);
-
-			int indexdel = safeInt();
-
-			if (indexdel < 0 || indexdel >= INV_SLOTS)
-			{
-				printf("\nОшибка! Такого слота не существует\n");
-				break;
-			}
-
-			inventory[indexdel] = 0;
-			printf("\nСлот %d очищен!\n", indexdel);
+			throw_item();
 			break;
 
-		case 6: {		//Любимый ресурс Вариант 7
-			int counts[MAX_ITEMS] = { 0 };
-			int bestId = 0;
-
-			for (int i = 0; i < INV_SLOTS; i++) {
-				int id = inventory[i];
-				if (id == 0) continue;               // пустые слоты не считаем
-				counts[id]++;
-				if (counts[id] > counts[bestId]) bestId = id;
-			}
-
-			if (bestId == 0) {
-				printf("\nИнвентарь пуст.\n");
-			}
-			else {
-				printf("\nСамый частый предмет: [%d] - %s, занимает слотов: %d\n", bestId, item_names[bestId], counts[bestId]);
-			}
+		case 6:		//Любимый ресурс Вариант 7
+			fav_item();
 			break;
-		}
-
+		
 		default:
 			printf("Нет такого пункта меню.\n"); //На случай введения цифры не соответствующей какому-либо пункту меню
 			break;
